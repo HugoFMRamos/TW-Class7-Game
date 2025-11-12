@@ -114,7 +114,7 @@ function update(dt) {
     let oldy = player.y;
     player.y += vy * dt;
 
-    for (const wall of walls) {
+    for (const wall of border) {
         if (circleRectCollision(player.x, player.y, player.r, wall)) {
             player.y = oldy;
             break;
