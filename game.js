@@ -139,6 +139,7 @@ function update(dt) {
         if (c.collected) {
             collectedCount++;
             generateCoin();
+            c.collected = false;
         }
     }
 
