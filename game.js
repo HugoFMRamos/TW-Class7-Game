@@ -93,9 +93,10 @@ function circleRectCollision(px, py, pr, rect) {
     return (dx * dx + dy * dy) < (pr * pr);
 }
 
-//Update Function
+let collectedTotal = 0; // track total collected
+
 function update(dt) {
-    if(!gameStarted) return;
+    if (!gameStarted) return;
 
     const maxSpeed = 4;
     const vx = (tiltX / 45) * maxSpeed;
@@ -103,9 +104,8 @@ function update(dt) {
 
     let oldx = player.x;
     player.x += vx * dt;
-
-    for(const wall of border) {
-        if(circleRectCollision(player.x, player.y, player.r, wall)) {
+    for (const wall of border) {
+        if (circleRectCollision(player.x, player.y, player.r, wall)) {
             player.x = oldx;
             break;
         }
@@ -113,7 +113,6 @@ function update(dt) {
 
     let oldy = player.y;
     player.y += vy * dt;
-
     for (const wall of border) {
         if (circleRectCollision(player.x, player.y, player.r, wall)) {
             player.y = oldy;
@@ -121,29 +120,27 @@ function update(dt) {
         }
     }
 
+    // Keep player inside canvas
     if (player.x - player.r < 0) player.x = player.r;
     if (player.x + player.r > canvas.width) player.x = canvas.width - player.r;
     if (player.y - player.r < 0) player.y = player.r;
     if (player.y + player.r > canvas.height) player.y = canvas.height - player.r;
 
-    let collectedCount = 0;
-    for (const c of coins) {
-        if (!c.collected) {
-            const dx = player.x - c.x;
-            const dy = player.y - c.y;
-            const dist2 = dx * dx + dy * dy;
-            if (dist2 < (player.r + c.r) * (player.r + c.r)) {
-                c.collected = true;
-            }
-        }
-        if (c.collected) {
-            collectedCount++;
-            generateCoin();
-            c.collected = false;
+    // Check for coin collection
+    for (let i = coins.length - 1; i >= 0; i--) {
+        const c = coins[i];
+        const dx = player.x - c.x;
+        const dy = player.y - c.y;
+        const dist2 = dx * dx + dy * dy;
+
+        if (dist2 < (player.r + c.r) * (player.r + c.r)) {
+            coins.splice(i, 1);  // remove collected coin
+            generateCoin();      // add new one
+            collectedTotal++;
         }
     }
 
-    statusEl.textContent = `You've collected, ${collectedCount} coins!`
+    statusEl.textContent = `You’ve collected ${collectedTotal} coins!`;
 }
 
 function draw() {
